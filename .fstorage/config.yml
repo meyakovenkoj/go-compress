@@ -1,0 +1,21 @@
+brotli:
+  metric: 1.0
+  level: 5
+bzip2:
+  metric: 1.0
+  level: 5
+gzip:
+  metric: 1.0
+  level: 5
+lzma:
+  metric: 1.0
+  level: 5
+zstd:
+  metric: 1.0
+  level: 5
+snappy:
+  metric: 1.0
+  level: 5
+lz4:
+  metric: 1.0
+  level: 5
