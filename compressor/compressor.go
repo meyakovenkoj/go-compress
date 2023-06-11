@@ -1,6 +1,7 @@
 package compressor
 
 import (
+	"bufio"
 	"io"
 
 	"compress/gzip"
@@ -14,7 +15,15 @@ import (
 	"github.com/ulikunitz/xz"
 )
 
-func Compress(uncompressedStream io.WriteCloser, algorithm predict.EncodeType) (compressedStream io.WriteCloser) {
+type BufWriteCloser struct {
+	*bufio.Writer
+}
+
+func (mwc *BufWriteCloser) Close() error {
+	return nil
+}
+
+func Compress(uncompressedStream io.Writer, algorithm predict.EncodeType) (compressedStream io.WriteCloser) {
 	var writer io.WriteCloser
 	cfg := predict.ReadConfig()
 	switch algorithm {
@@ -33,10 +42,9 @@ func Compress(uncompressedStream io.WriteCloser, algorithm predict.EncodeType) (
 	case predict.Zstd:
 		writer, _ = zstd.NewWriter(uncompressedStream)
 	case predict.None:
-		writer = uncompressedStream
+		bw := bufio.NewWriter(uncompressedStream)
+		writer = &BufWriteCloser{bw}
 	}
-
-	// writer.Write()
 
 	return writer
 }
