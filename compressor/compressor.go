@@ -11,6 +11,7 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/larzconwell/bzip2"
 	"github.com/meyakovenkoj/go-compress/predict"
+	"github.com/meyakovenkoj/go-compress/typing"
 	"github.com/pierrec/lz4"
 	"github.com/ulikunitz/xz"
 )
@@ -23,9 +24,9 @@ func (mwc *BufWriteCloser) Close() error {
 	return nil
 }
 
-func Compress(uncompressedStream io.Writer, algorithm predict.EncodeType) (compressedStream io.WriteCloser) {
+func Compress(uncompressedStream io.Writer, stat typing.FileStats) (compressedStream io.WriteCloser, algorithm predict.EncodeType) {
 	var writer io.WriteCloser
-	cfg := predict.ReadConfig()
+	algorithm, cfg := predict.Predict(stat)
 	switch algorithm {
 	case predict.Lz4:
 		writer = lz4.NewWriter(uncompressedStream)
@@ -46,5 +47,5 @@ func Compress(uncompressedStream io.Writer, algorithm predict.EncodeType) (compr
 		writer = &BufWriteCloser{bw}
 	}
 
-	return writer
+	return writer, algorithm
 }

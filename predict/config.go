@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/meyakovenkoj/go-compress/typing"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -54,12 +56,55 @@ type AlgorithmConfig struct {
 	} `yaml:"lz4"`
 }
 
-func ReadConfig() (cfg AlgorithmConfig) {
-	cfg = AlgorithmConfig{}
-	err := cleanenv.ReadConfig(filepath.Join(configPath, "config.yml"), &cfg)
+func ReadConfig() [6]AlgorithmConfig {
+	fullConfig := [6]AlgorithmConfig{}
+	cfg := AlgorithmConfig{}
+	err := cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-exe.yml"), &cfg)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-	return cfg
+	fullConfig[typing.Executable] = cfg
+
+	cfg = AlgorithmConfig{}
+	err = cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-bin.yml"), &cfg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fullConfig[typing.Binary] = cfg
+
+	cfg = AlgorithmConfig{}
+	err = cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-img.yml"), &cfg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fullConfig[typing.Image] = cfg
+
+	cfg = AlgorithmConfig{}
+	err = cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-txt.yml"), &cfg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fullConfig[typing.Text] = cfg
+
+	cfg = AlgorithmConfig{}
+	err = cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-jsn.yml"), &cfg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fullConfig[typing.Json] = cfg
+
+	cfg = AlgorithmConfig{}
+	err = cleanenv.ReadConfig(filepath.Join(configPath, "compress-config-ukn.yml"), &cfg)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	fullConfig[typing.Unknown] = cfg
+
+	return fullConfig
 }

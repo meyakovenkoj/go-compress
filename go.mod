@@ -4,9 +4,12 @@ go 1.19
 
 require github.com/google/brotli/go/cbrotli v0.0.0-20230201092028-ed1995b6bda1
 
+require golang.org/x/net v0.8.0 // indirect
+
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/andybalholm/brotli v1.0.5
+	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/golang/snappy v0.0.4
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.4.2 // indirect

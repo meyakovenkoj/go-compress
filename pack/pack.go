@@ -1,17 +1,17 @@
 package pack
 
-// package main
-
 import (
 	"archive/tar"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/meyakovenkoj/go-compress/typing"
 )
 
-func Pack(src string, buf io.Writer) (packedStream *tar.Writer) {
-	// tar > buf
+func Pack(src string, buf io.Writer) (packedStream *tar.Writer, newStat typing.FileStats) {
+	stat := &typing.FileStats{0, 0, 0, 0, 0, 0}
 	tarStream := tar.NewWriter(buf)
 
 	// walk through every file in the folder
@@ -30,12 +30,19 @@ func Pack(src string, buf io.Writer) (packedStream *tar.Writer) {
 		if err := tarStream.WriteHeader(header); err != nil {
 			return err
 		}
+
 		// if not a dir, write file content
 		if !fi.IsDir() {
 			data, err := os.Open(file)
 			if err != nil {
 				return err
 			}
+			fileInfo, err := data.Stat()
+			if err != nil {
+				return err
+			}
+			typing.SetStat(typing.Match(file), fileInfo.Size(), stat)
+
 			if _, err := io.Copy(tarStream, data); err != nil {
 				return err
 			}
@@ -43,7 +50,7 @@ func Pack(src string, buf io.Writer) (packedStream *tar.Writer) {
 		return nil
 	})
 
-	return tarStream
+	return tarStream, typing.Normalize(*stat)
 }
 
 func Unpack(dstPath string, packedStream io.Reader) {
@@ -62,7 +69,7 @@ func Unpack(dstPath string, packedStream io.Reader) {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.Mkdir(filepath.Join(dstPath, header.Name), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Join(dstPath, header.Name), 0755); err != nil {
 				log.Fatalf("Unpack: Mkdir() failed: %s", err.Error())
 			}
 		case tar.TypeReg:
@@ -84,31 +91,3 @@ func Unpack(dstPath string, packedStream io.Reader) {
 
 	}
 }
-
-// func main() {
-// 	f, err := os.OpenFile("/tmp/123.tar", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer f.Close()
-// 	var mode predict.EncodeType
-// 	mode = 1
-// 	compressed := compressor.Compress(f, mode)
-
-// 	packed := Pack("./main.go", compressed)
-// 	packed.Close()
-// 	compressed.Close()
-
-// 	os.Mkdir("temp", os.ModePerm)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// 	outf, err := os.Open("/tmp/123.tar")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	decompressed := compressor.Decompress(outf, mode)
-// 	Unpack("temp", decompressed)
-
-// }

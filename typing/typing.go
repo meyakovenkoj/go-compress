@@ -1,52 +1,88 @@
 package typing
 
 import (
-	//"github.com/gabriel-vasile/mimetype"
+	"flag"
 	"fmt"
-	"os"
 
-	"github.com/h2non/filetype"
-	"github.com/h2non/filetype/types"
+	"github.com/gabriel-vasile/mimetype"
 )
 
-func Match(file *os.File) (kind types.Type) {
-	header := make([]byte, 261)
-	n, _ := file.Read(header)
-	if n == 0 {
-		fmt.Println("get eof")
+const (
+	Unknown int = iota
+	Executable
+	Binary
+	Image
+	Text
+	Json
+)
+
+type FileStats [6]float64
+
+func Normalize(stat FileStats) FileStats {
+	sum := 0.0
+	sum += stat[Executable] + stat[Binary] + stat[Image] + stat[Text] + stat[Json] + stat[Unknown]
+	newStats := FileStats{}
+	newStats[Executable] = stat[Executable] / sum
+	newStats[Binary] = stat[Binary] / sum
+	newStats[Image] = stat[Image] / sum
+	newStats[Text] = stat[Text] / sum
+	newStats[Json] = stat[Json] / sum
+	newStats[Unknown] = stat[Unknown] / sum
+	return newStats
+}
+
+func SetStat(typeOf int, size int64, stat *FileStats) {
+	switch typeOf {
+	case Unknown:
+		stat[Unknown] += float64(size)
+		return
+	case Binary:
+		stat[Binary] += float64(size)
+		return
+	case Image:
+		stat[Image] += float64(size)
+		return
+	case Executable:
+		stat[Executable] += float64(size)
+		return
+	case Json:
+		stat[Json] += float64(size)
+		return
+	case Text:
+		stat[Text] += float64(size)
 		return
 	}
-	kind, _ = filetype.Match(header)
-	return
+}
+
+func Match(filename string) int {
+	mimetype.SetLimit(1024 * 1024)
+	mtype, err := mimetype.DetectFile(filename)
+	if err != nil {
+		fmt.Println(err)
+		return Unknown
+	}
+	if mtype.Is("application/octet-stream") {
+		return Binary
+	} else if mtype.Is("image/tiff") {
+		return Image
+	} else if mtype.Is("application/x-mach-binary") || mtype.Is("application/vnd.microsoft.portable-executable") {
+		return Executable
+	} else if mtype.Is("application/json") {
+		return Json
+	} else if mtype.Is("text/plain") || mtype.Parent().Is("text/plain") {
+		return Text
+	} else {
+		return Unknown
+	}
 }
 
 func main() {
-	// buf, _ := ioutil.ReadFile("sample.jpg")
-	file, _ := os.Open("movie.mp4")
+	filePtr := flag.String("file", "", "file to check")
+	flag.Parse()
 
-	// We only have to pass the file header = first 261 bytes
-	kind := Match(file)
-	// kind, _ := filetype.Match(buf)
-	if kind == filetype.Unknown {
-		fmt.Println("Unknown file type")
+	if *filePtr == "" {
+		fmt.Println("need to set file name with flag -file")
 		return
 	}
-
-	fmt.Printf("File type: %s. MIME: %s\n", kind.Extension, kind.MIME.Value)
+	Match(*filePtr)
 }
-
-// func get_type(filename):
-//     type, enc = mimetypes.guess_type(filename)
-//     if type is not None and type.startswith('text/'):
-//         type = 'text'
-//     match type:
-//         case 'text':
-//             return Type.TXT
-//         case 'application/json':
-//             return Type.JSN
-//         case 'application/octet-stream':
-//             return Type.BIN
-//         case None:
-//             return Type.BIN
-//         case _:
-//             return Type.UKN

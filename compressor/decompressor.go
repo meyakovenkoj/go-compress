@@ -9,7 +9,6 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/golang/snappy"
 
-	// "github.com/google/brotli/go/cbrotli"
 	"github.com/klauspost/compress/zstd"
 	"github.com/meyakovenkoj/go-compress/predict"
 	"github.com/pierrec/lz4"
