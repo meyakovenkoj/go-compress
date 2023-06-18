@@ -30,27 +30,27 @@ type AlgorithmConfig struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"brotli"`
-	bzip2 struct {
+	Bzip2 struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"bzip2"`
-	gzip struct {
+	Gzip struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"gzip"`
-	lzma struct {
+	Lzma struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"lzma"`
-	zstd struct {
+	Zstd struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"zstd"`
-	snappy struct {
+	Snappy struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"snappy"`
-	lz4 struct {
+	Lz4 struct {
 		Metric float32 `yaml:"metric"`
 		Level  int     `yaml:"level"`
 	} `yaml:"lz4"`

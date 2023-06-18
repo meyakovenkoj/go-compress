@@ -23,34 +23,34 @@ func Predict(stat typing.FileStats) (EncodeType, AlgorithmConfig) {
 
 	selectedConfig := config[mostType]
 
-	maxVal := float32(0.0)
+	minVal := float32(10.0)
 	bestAlg := None
-	if selectedConfig.bzip2.Metric > maxVal {
-		maxVal = selectedConfig.bzip2.Metric
+	if selectedConfig.Bzip2.Metric < minVal {
+		minVal = selectedConfig.Bzip2.Metric
 		bestAlg = Bzip2
 	}
-	if selectedConfig.gzip.Metric > maxVal {
-		maxVal = selectedConfig.gzip.Metric
+	if selectedConfig.Gzip.Metric < minVal {
+		minVal = selectedConfig.Gzip.Metric
 		bestAlg = Gzip
 	}
-	if selectedConfig.lz4.Metric > maxVal {
-		maxVal = selectedConfig.lz4.Metric
+	if selectedConfig.Lz4.Metric < minVal {
+		minVal = selectedConfig.Lz4.Metric
 		bestAlg = Lz4
 	}
-	if selectedConfig.lzma.Metric > maxVal {
-		maxVal = selectedConfig.lzma.Metric
+	if selectedConfig.Lzma.Metric < minVal {
+		minVal = selectedConfig.Lzma.Metric
 		bestAlg = Lzma
 	}
-	if selectedConfig.zstd.Metric > maxVal {
-		maxVal = selectedConfig.zstd.Metric
+	if selectedConfig.Zstd.Metric < minVal {
+		minVal = selectedConfig.Zstd.Metric
 		bestAlg = Zstd
 	}
-	if selectedConfig.snappy.Metric > maxVal {
-		maxVal = selectedConfig.snappy.Metric
+	if selectedConfig.Snappy.Metric < minVal {
+		minVal = selectedConfig.Snappy.Metric
 		bestAlg = Snappy
 	}
-	if selectedConfig.Brotli.Metric > maxVal {
-		maxVal = selectedConfig.Brotli.Metric
+	if selectedConfig.Brotli.Metric < minVal {
+		minVal = selectedConfig.Brotli.Metric
 		bestAlg = Brotli
 	}
 	return bestAlg, selectedConfig
